@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人体基本轴与基本面 - 运动解剖学互动学习</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            overflow: hidden;
+            user-select: none;
+        }
+        .canvas-container {
+            cursor: move;
+            touch-action: none;
+        }
+        .control-panel {
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-right: 6px;
+        }
+    </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const katexOptions = {
+        delimiters: [
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+        ],
+        throwOnError: false,
+        strict: false,
+        trust: true
+    };
+
+    let renderTimeout;
+    function safeRender() {
+        if (renderTimeout) clearTimeout(renderTimeout);
+        renderTimeout = setTimeout(() => {
+            renderMathInElement(document.body, katexOptions);
+        }, 100);
+    }
+
+    renderMathInElement(document.body, katexOptions);
+
+    const observer = new MutationObserver((mutations) => {
+        let shouldRender = false;
+        mutations.forEach((mutation) => {
+            if (mutation.target &&
+                mutation.target.className &&
+                typeof mutation.target.className === 'string' &&
+                mutation.target.className.includes('katex')) {
+                return;
+            }
+            shouldRender = true;
+        });
+
+        if (shouldRender) {
+            safeRender();
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true
+    });
+
+    setInterval(() => {
+        const text = document.body.innerText;
+        if (text.includes('\\(') || text.includes('$$')) {
+            safeRender();
+        }
+    }, 2000);
+});
+</script>
+</head>
+<body class="flex flex-col h-screen">
+
+    <!-- Header -->
+    <header class="p-4 bg-white border-b shadow-sm z-10">
+        <h1 class="text-xl font-bold text-slate-800 text-center">人体基本轴与基本面</h1>
+    </header>
+
+    <main class="flex-1 flex flex-col md:flex-row relative overflow-hidden">
+        
+        <!-- Left Sidebar (Controls) -->
+        <aside class="w-full md:w-72 p-6 control-panel border-r z-20 overflow-y-auto">
+            <section class="mb-8">
+                <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">基本轴 (Axes)</h2>
+                <div class="space-y-3">
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" id="vAxis" class="w-4 h-4 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500">
+                        <span class="ml-3 text-slate-700 group-hover:text-emerald-600 transition-colors">垂直轴 (Vertical Axis)</span>
+                        <span class="ml-auto legend-dot bg-emerald-500"></span>
+                    </label>
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" id="sAxis" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                        <span class="ml-3 text-slate-700 group-hover:text-blue-600 transition-colors">矢状轴 (Sagittal Axis)</span>
+                        <span class="ml-auto legend-dot bg-blue-500"></span>
+                    </label>
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" id="cAxis" class="w-4 h-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500">
+                        <span class="ml-3 text-slate-700 group-hover:text-rose-600 transition-colors">冠状轴 (Coronal Axis)</span>
+                        <span class="ml-auto legend-dot bg-rose-500"></span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="mb-8">
+                <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">基本面 (Planes)</h2>
+                <div class="space-y-3">
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" id="sPlane" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                        <span class="ml-3 text-slate-700 group-hover:text-blue-600 transition-colors">矢状面 (Sagittal Plane)</span>
+                        <div class="ml-auto w-3 h-3 border border-blue-400 bg-blue-100 opacity-60"></div>
+                    </label>
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" id="cPlane" class="w-4 h-4 text-rose-600 rounded border-gray-300 focus:ring-rose-500">
+                        <span class="ml-3 text-slate-700 group-hover:text-rose-600 transition-colors">冠状面 (Coronal Plane)</span>
+                        <div class="ml-auto w-3 h-3 border border-rose-400 bg-rose-100 opacity-60"></div>
+                    </label>
+                    <label class="flex items-center cursor-pointer group">
+                        <input type="checkbox" id="hPlane" class="w-4 h-4 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500">
+                        <span class="ml-3 text-slate-700 group-hover:text-emerald-600 transition-colors">水平面 (Horizontal Plane)</span>
+                        <div class="ml-auto w-3 h-3 border border-emerald-400 bg-emerald-100 opacity-60"></div>
+                    </label>
+                </div>
+            </section>
+
+            <div class="mt-auto pt-6 border-t text-xs text-slate-500 leading-relaxed italic">
+                拖动旋转模型观察空间关系。<br>
+                轴与面始终正交垂直。
+            </div>
+        </aside>
+
+        <!-- Visualization Area -->
+        <div class="flex-1 relative canvas-container overflow-hidden bg-white" id="container">
+            <canvas id="canvas3d"></canvas>
+            
+            <!-- Tooltip / Info Overlay -->
+            <div class="absolute bottom-6 right-6 p-4 bg-white/80 rounded-lg shadow-sm border text-sm max-w-xs pointer-events-none transition-opacity duration-300" id="info-box">
+                <p class="font-bold text-slate-800 mb-1">轴面运动关系</p>
+                <div id="dynamic-info" class="text-slate-600">
+                    勾选左侧选项观察解剖学参考系。
+                </div>
+            </div>
+
+            <!-- Math Floating Box -->
+            <div class="absolute top-6 right-6 p-3 bg-white/50 rounded-md text-xs border border-white/40">
+                \[ \text{运动轨迹平面} \perp \text{旋转轴} \]
+                \[ \text{垂直轴(Y)} \perp \text{矢状轴(Z)} \perp \text{冠状轴(X)} \]
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('canvas3d');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('container');
+        const infoText = document.getElementById('dynamic-info');
+
+        // State
+        let width, height;
+        let rotationX = -0.15;
+        let rotationY = 0.5;
+        let isDragging = false;
+        let lastMouseX, lastMouseY;
+
+        const state = {
+            vAxis: false, sAxis: false, cAxis: false,
+            sPlane: false, cPlane: false, hPlane: false
+        };
+
+        // UI Listeners
+        ['vAxis', 'sAxis', 'cAxis', 'sPlane', 'cPlane', 'hPlane'].forEach(id => {
+            const el = document.getElementById(id);
+            el.addEventListener('change', (e) => {
+                state[id] = e.target.checked;
+                updateInfo();
+            });
+        });
+
+        function updateInfo() {
+            let info = "";
+            if (state.vAxis || state.hPlane) info += "绕<b>垂直轴</b>的转动发生在<b>水平面</b>内。<br>";
+            if (state.cAxis || state.sPlane) info += "绕<b>冠状轴</b>的屈伸运动发生在<b>矢状面</b>内。<br>";
+            if (state.sAxis || state.cPlane) info += "绕<b>矢状轴</b>的收展运动发生在<b>冠状面</b>内。<br>";
+            
+            if (info === "") info = "标准解剖学姿势：身体直立，双眼平视，手掌向前，双脚并拢。";
+            infoText.innerHTML = info;
+        }
+
+        // Camera & Projection
+        const scale = 5;
+        const perspective = 800;
+
+        function project(x, y, z) {
+            // Rotation Y
+            let x1 = x * Math.cos(rotationY) + z * Math.sin(rotationY);
+            let z1 = -x * Math.sin(rotationY) + z * Math.cos(rotationY);
+            // Rotation X
+            let y2 = y * Math.cos(rotationX) - z1 * Math.sin(rotationX);
+            let z2 = y * Math.sin(rotationX) + z1 * Math.cos(rotationX);
+
+            const factor = perspective / (perspective + z2);
+            return {
+                x: x1 * factor * scale + width / 2,
+                y: -y2 * factor * scale + height / 2, // Invert Y for screen
+                z: z2
+            };
+        }
+
+        // 3D Point Definitions for a simple Mannequin
+        // Standard Anatomical Position: palms forward (+Z)
+        const mannequin = {
+            points: {
+                head: [0, 45, 0],
+                neck: [0, 35, 0],
+                shoulderL: [-12, 35, 0], shoulderR: [12, 35, 0],
+                elbowL: [-14, 20, 5], elbowR: [14, 20, 5],
+                handL: [-15, 5, 10], handR: [15, 5, 10], // Palms forward
+                hipL: [-8, 0, 0], hipR: [8, 0, 0],
+                kneeL: [-8, -20, 0], kneeR: [8, -20, 0],
+                footL: [-8, -45, 5], footR: [8, -45, 5]
+            },
+            bones: [
+                ['head', 'neck'], ['neck', 'shoulderL'], ['neck', 'shoulderR'],
+                ['shoulderL', 'elbowL'], ['elbowL', 'handL'],
+                ['shoulderR', 'elbowR'], ['elbowR', 'handR'],
+                ['neck', 'hipL'], ['neck', 'hipR'],
+                ['hipL', 'kneeL'], ['kneeL', 'footL'],
+                ['hipR', 'kneeR'], ['kneeR', 'footR'],
+                ['hipL', 'hipR']
+            ]
+        };
+
+        function drawMannequin() {
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#334155';
+            
+            mannequin.bones.forEach(bone => {
+                const p1 = project(...mannequin.points[bone[0]]);
+                const p2 = project(...mannequin.points[bone[1]]);
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
+            });
+
+            // Head circle
+            const hp = project(...mannequin.points.head);
+            ctx.beginPath();
+            ctx.arc(hp.x, hp.y, 8 * scale * (perspective/(perspective+hp.z))/5, 0, Math.PI * 2);
+            ctx.fillStyle = '#334155';
+            ctx.fill();
+        }
+
+        function drawAxes() {
+            const len = 60;
+            const origin = project(0, 0, 0);
+
+            if (state.vAxis) { // Vertical - Green
+                const p = project(0, len, 0);
+                const p_neg = project(0, -len, 0);
+                drawArrow(p_neg, p, '#10b981', '垂直轴');
+            }
+            if (state.sAxis) { // Sagittal - Blue
+                const p = project(0, 0, len);
+                const p_neg = project(0, 0, -len);
+                drawArrow(p_neg, p, '#3b82f6', '矢状轴');
+            }
+            if (state.cAxis) { // Coronal - Red
+                const p = project(len, 0, 0);
+                const p_neg = project(-len, 0, 0);
+                drawArrow(p_neg, p, '#f43f5e', '冠状轴');
+            }
+        }
+
+        function drawArrow(p1, p2, color, label) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+            
+            // Text
+            ctx.fillStyle = color;
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText(label, p2.x + 5, p2.y);
+        }
+
+        function drawPlanes() {
+            const size = 50;
+            
+            // Sagittal Plane (YZ) - Blue
+            if (state.sPlane) {
+                drawQuad([
+                    [0, size, size], [0, size, -size], [0, -size, -size], [0, -size, size]
+                ], 'rgba(59, 130, 246, 0.2)', 'rgba(59, 130, 246, 0.5)');
+            }
+
+            // Coronal Plane (XY) - Red
+            if (state.cPlane) {
+                drawQuad([
+                    [size, size, 0], [-size, size, 0], [-size, -size, 0], [size, -size, 0]
+                ], 'rgba(244, 63, 94, 0.2)', 'rgba(244, 63, 94, 0.5)');
+            }
+
+            // Horizontal Plane (XZ) - Green
+            if (state.hPlane) {
+                drawQuad([
+                    [size, 0, size], [-size, 0, size], [-size, 0, -size], [size, 0, -size]
+                ], 'rgba(16, 185, 129, 0.2)', 'rgba(16, 185, 129, 0.5)');
+            }
+        }
+
+        function drawQuad(pts, fill, stroke) {
+            const projs = pts.map(p => project(...p));
+            ctx.beginPath();
+            ctx.moveTo(projs[0].x, projs[0].y);
+            for(let i=1; i<projs.length; i++) ctx.lineTo(projs[i].x, projs[i].y);
+            ctx.closePath();
+            ctx.fillStyle = fill;
+            ctx.fill();
+            ctx.strokeStyle = stroke;
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Simplified sorting: draw background half of planes, then mannequin, then foreground half
+            // For this educational purpose, transparency handles the overlap well enough
+            drawPlanes();
+            drawMannequin();
+            drawAxes();
+            
+            requestAnimationFrame(render);
+        }
+
+        // Interaction
+        container.addEventListener('mousedown', e => {
+            isDragging = true;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            const dx = e.clientX - lastMouseX;
+            const dy = e.clientY - lastMouseY;
+            rotationY += dx * 0.01;
+            rotationX += dy * 0.01;
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+        });
+
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        // Resize
+        function resize() {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        render();
+        updateInfo();
+
+    </script>
+</body>
+</html>
